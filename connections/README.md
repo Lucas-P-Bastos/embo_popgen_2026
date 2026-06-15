@@ -16,14 +16,14 @@ In addition to the SSH connection, students will also need to access two web pla
 
 They are available at the following addresses:
 
-https://<hostname>
+* `https://<hostname>`
 and
 
-https://<hostname>/jhub
-For example, if your assigned hostname is popgen446-1.cloud.ba.infn.it, the two links will be:
+* `https://<hostname>/jhub`
+For example, if your assigned hostname is `popgen446-1.cloud.ba.infn.it`, the two links will be:
 
-https://popgen446-1.cloud.ba.infn.it
-https://popgen446-1.cloud.ba.infn.it/jhub
+* https://popgen446-1.cloud.ba.infn.it
+* https://popgen446-1.cloud.ba.infn.it/jhub
 On both platforms, please log in using your personal username and password, shared via slack.
 
-Please keep your password strictly personal and do not share it with anyone.
+** Please keep your password strictly personal and do not share it with anyone **
