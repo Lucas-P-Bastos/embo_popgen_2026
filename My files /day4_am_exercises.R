@@ -91,7 +91,15 @@ simulateWFWithSelection <- function(twoN, f, G, v){
     #f=0.1  
     # genic selection with viabilities v=(1,1−s,(1−s)2) for G=1000 and plot them in one plot. 
 # Start with s=0.01. 
+s <- 0.01
+trajectories <- replicate(100, simulateWFWithSelection(twoN = 1000, f = 0.1, G = 1000, v=c(1,1-s,(1-s)^2)))
+plot(0, type='n', ylim=c(0,1), xlim=c(0, nrow(trajectories)))
+invisible(apply(trajectories, 2, lines, type='l'))
+print(paste("Allele was fixed in", sum(trajectories[1000,] == 1), "/", ncol(trajectories), "cases."))
 
-
-
-
+# Q9 Set 2N=10^6 and dominant v=(1,1,1−s) with s=0.05.
+s <- 0.05
+trajectories <- replicate(100, simulateWFWithSelection(twoN = 10^6, f = 0.1, G = 1000, v=c(1,1,1-s)))
+plot(0, type='n', ylim=c(0,1), xlim=c(0, nrow(trajectories)))
+invisible(apply(trajectories, 2, lines, type='l'))
+print(paste("Allele was fixed in", sum(trajectories[1000,] == 1), "/", ncol(trajectories), "cases."))
