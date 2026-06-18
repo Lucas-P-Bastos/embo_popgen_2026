@@ -145,7 +145,7 @@ Solutions
 barplot(c(1,3,1), xlab = "Derived allele frequency", ylab = "Counts")
 ```
 
-![](exercises_coalescent_files/figure-markdown_github/unnamed-chunk-1-1.png)
+![](exercises_day4_afternoon_coalescent_files/figure-markdown_github/unnamed-chunk-1-1.png)
 The expected number of mutations with frequency *k* is given by
 $\operatorname{E}\[f_k\]=\frac{\theta}{k}$. Hence, we expect
 $\E\[f_1\]=\theta$ singletons per base pair. Among the 20 base pairs, we
@@ -280,7 +280,7 @@ plotTrees <- function(trees, popCol=c("black", "orange2", "purple")){
     if(tr %% nCols == 1){ axis(side = 2)}
     
     #add tips and color by population
-    pop <- as.numeric(unlist(lapply(strsplit(trees[[1]]$tip.label, "[.]"), '[', 2) ))
+    pop <- as.numeric(unlist(lapply(strsplit(trees[[tr]]$tip.label, "[.]"), '[', 2) ))
     
     nTips <- length(trees[[tr]]$tip.label);
     symbols(1:nTips, rep(0, nTips), circles=rep(0.4, nTips), add=TRUE, inches=0.03, fg=NA, bg=popCol[pop])

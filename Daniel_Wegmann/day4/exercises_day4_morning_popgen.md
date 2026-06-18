@@ -124,7 +124,7 @@ Solutions
 </summary>
 
 We can calculate the probability of increase analogously as the integral
-from 201 to 1000, or as 1 minus the integral from 0 to 200:
+from 11 to 100, or as 1 minus the integral from 0 to 10:
 
 ``` r
 1 - pbinom(10, size = 100, prob = 0.1)
@@ -156,7 +156,7 @@ for(twoN in c(10, 100, 1000, 10000)){
 }
 ```
 
-![](exercises_popgen_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](exercises_day4_morning_popgen_files/figure-markdown_github/unnamed-chunk-6-1.png)
 </details>
 
 <br/>
@@ -208,13 +208,13 @@ plot(0, type='n', ylim=c(0,1), xlim=c(0, nrow(trajectories)))
 invisible(apply(trajectories, 2, lines, type='l'))
 ```
 
-![](exercises_popgen_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](exercises_day4_morning_popgen_files/figure-markdown_github/unnamed-chunk-8-1.png)
 
 ``` r
 print(paste("Allele was lost in", sum(trajectories[1000,] == 0), "/", ncol(trajectories), "cases."))
 ```
 
-    ## [1] "Allele was lost in 897 / 1000 cases."
+    ## [1] "Allele was lost in 909 / 1000 cases."
 
 The allele is expected to go to fixation with the probability of its
 initial allele frequency *f*, and hence to be lost with probability
@@ -247,7 +247,7 @@ plot(0, type='n', ylim=c(0,1), xlim=c(0, nrow(trajectories)))
 invisible(apply(trajectories, 2, lines, type='l'))
 ```
 
-![](exercises_popgen_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](exercises_day4_morning_popgen_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 ``` r
 print(paste("Allele was fixed in", sum(trajectories[1000,] == 1), "/", ncol(trajectories), "cases."))
@@ -325,13 +325,13 @@ plot(0, type='n', ylim=c(0,1), xlim=c(0, nrow(trajectories)))
 invisible(apply(trajectories, 2, lines, type='l'))
 ```
 
-![](exercises_popgen_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](exercises_day4_morning_popgen_files/figure-markdown_github/unnamed-chunk-11-1.png)
 
 ``` r
 print(paste("Allele was fixed in", sum(trajectories[1000,] == 1), "/", ncol(trajectories), "cases."))
 ```
 
-    ## [1] "Allele was fixed in 86 / 100 cases."
+    ## [1] "Allele was fixed in 90 / 100 cases."
 
 A weak selection coefficient of *s* = 0.01 leads to only very marginal
 difference to the neutral case (allele is lost in about 80% rather than
@@ -360,7 +360,7 @@ plot(0, type='n', ylim=c(0,1), xlim=c(0, nrow(trajectories)))
 invisible(apply(trajectories, 2, lines, type='l'))
 ```
 
-![](exercises_popgen_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](exercises_day4_morning_popgen_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
 ``` r
 print(paste("Allele was fixed in", sum(trajectories[1000,] == 1), "/", ncol(trajectories), "cases."))
