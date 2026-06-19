@@ -1,0 +1,131 @@
+sampleName	group	breed
+BRUS000001	small	Brussels Griffon
+BRUS000002	small	Brussels Griffon
+BRUS000003	small	Brussels Griffon
+BRUS000004	small	Brussels Griffon
+BRUS000005	small	Brussels Griffon
+BRUS000006	small	Brussels Griffon
+BRUS000007	small	Brussels Griffon
+CHIH000005	small	Chihuahua
+CHIH000006	small	Chihuahua
+DACH000001	small	Dachshund
+DACH000002	small	Dachshund
+DACH000003	small	Dachshund
+DACH000004	small	Dachshund
+DACH000005	small	Dachshund
+DACH000006	small	Dachshund
+DACH000007	small	Dachshund
+DACH000008	small	Dachshund
+DACH000009	small	Dachshund
+DACH000010	small	Dachshund
+DACH000011	small	Dachshund
+DACH000012	small	Dachshund
+DACH000013	small	Dachshund
+DACH000014	small	Dachshund
+DACH000015	small	Dachshund
+DACH000016	small	Dachshund
+DACH000017	small	Dachshund
+GSZG000007	small	Pomeranian
+MALT000001	small	Maltese
+MALT000002	small	Maltese
+MALT000003	small	Maltese
+MALT000004	small	Maltese
+PEKE000001	small	Pekingese
+PEKE000002	small	Pekingese
+PEKE000003	small	Pekingese
+POMR000002	small	Pomeranian
+POMR000003	small	Pomeranian
+POMR000004	small	Pomeranian
+POMR000005	small	Pomeranian
+POMR000006	small	Pomeranian
+POMR000007	small	Pomeranian
+POMR000008	small	Pomeranian
+SHIH000001	small	Shih Tzu
+SHIH000002	small	Shih Tzu
+SHIH000003	small	Shih Tzu
+SHIH000004	small	Shih Tzu
+SHIH000005	small	Shih Tzu
+TYFX000001	small	Toy Fox Terrier
+TYFX000002	small	Toy Fox Terrier
+TYFX000003	small	Toy Fox Terrier
+TYFX000004	small	Toy Fox Terrier
+TYFX000005	small	Toy Fox Terrier
+TYFX000006	small	Toy Fox Terrier
+TYFX000007	small	Toy Fox Terrier
+TYFX000008	small	Toy Fox Terrier
+TYFX000009	small	Toy Fox Terrier
+TYFX000010	small	Toy Fox Terrier
+YORK000001	small	Yorkshire Terrier
+YORK000002	small	Yorkshire Terrier
+YORK000003	small	Yorkshire Terrier
+YORK000004	small	Yorkshire Terrier
+YORK000005	small	Yorkshire Terrier
+BRMD000001	large	Bernese Mountain Dog
+BRMD000002	large	Bernese Mountain Dog
+BRMD000003	large	Bernese Mountain Dog
+BRMD000004	large	Bernese Mountain Dog
+BRMD000005	large	Bernese Mountain Dog
+BRMD000006	large	Bernese Mountain Dog
+BRMD000007	large	Bernese Mountain Dog
+BRMD000008	large	Bernese Mountain Dog
+BRMD000009	large	Bernese Mountain Dog
+BRMD000010	large	Bernese Mountain Dog
+BULM000001	large	Bullmastiff
+BULM000002	large	Bullmastiff
+BULM000003	large	Bullmastiff
+BULM000004	large	Bullmastiff
+BULM000005	large	Bullmastiff
+BULM000006	large	Bullmastiff
+GPYR000001	large	Great Pyrenees
+GPYR000002	large	Great Pyrenees
+GPYR000003	large	Great Pyrenees
+GPYR000004	large	Great Pyrenees
+GPYR000005	large	Great Pyrenees
+GPYR000006	large	Great Pyrenees
+GSMD000001	large	Greater Swiss Mountain Dog
+GSMD000002	large	Greater Swiss Mountain Dog
+GSMD000003	large	Greater Swiss Mountain Dog
+GSMD000004	large	Greater Swiss Mountain Dog
+GSMD000005	large	Greater Swiss Mountain Dog
+GSMD000006	large	Greater Swiss Mountain Dog
+GSMD000007	large	Greater Swiss Mountain Dog
+GSMD000008	large	Greater Swiss Mountain Dog
+GSMD000009	large	Greater Swiss Mountain Dog
+GSMD000010	large	Greater Swiss Mountain Dog
+LEON000001	large	Leonberger
+LEON000003	large	Leonberger
+LEON000004	large	Leonberger
+LEON000007	large	Leonberger
+LEON000008	large	Leonberger
+LEON000009	large	Leonberger
+LEON000010	large	Leonberger
+LEON000011	large	Leonberger
+LEON000012	large	Leonberger
+LEON000013	large	Leonberger
+LEON000014	large	Leonberger
+MAST000001	large	Mastiff
+MAST000002	large	Mastiff
+MAST000003	large	Mastiff
+MAST000004	large	Mastiff
+MAST000005	large	Mastiff
+MAST000006	large	Mastiff
+NEWF000001	large	Newfoundland
+NEWF000002	large	Newfoundland
+NEWF000003	large	Newfoundland
+NEWF000004	large	Newfoundland
+NEWF000005	large	Newfoundland
+NEWF000006	large	Newfoundland
+PYSH000002	large	Great Pyrenees
+STBD000001	large	Saint Bernard
+STBD000002	large	Saint Bernard
+STBD000003	large	Saint Bernard
+STBD000004	large	Saint Bernard
+STBD000005	large	Saint Bernard
+STBD000006	large	Saint Bernard
+STBD000007	large	Saint Bernard
+STBD000008	large	Saint Bernard
+STBD000009	large	Saint Bernard
+STBD000010	large	Saint Bernard
+STBD000011	large	Saint Bernard
+STBD000012	large	Saint Bernard
+STBD000013	large	Saint Bernard
