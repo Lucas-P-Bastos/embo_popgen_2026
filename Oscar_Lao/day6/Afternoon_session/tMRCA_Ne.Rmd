@@ -1,0 +1,534 @@
+---
+title: "tMRCA"
+author: "Oscar Lao"
+date: "2026-01-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+rm(list=ls());
+```
+
+##################################################################################
+#
+# Create a model that has a constant population size with an instantaneous population
+# change. Sample two chromosomes.
+#
+##################################################################################
+
+# Check the next code. Comment each line of the code
+
+```{r}
+# b) assuming a constant population size A with a recent population change
+model.single.pop.with.recent.population.change.tMRCA <- function(population_size_in_present, effective_population_size_1, time_change_population_size)
+{
+  # Coalescence rate per generation within an island
+  # (Change to 1 / (2 * Ne) if modeling a diploid population)
+  coal_rate <- 1 / population_size_in_present
+  ecoal.t <- rexp(1, rate = coal_rate);
+  if(ecoal.t <= time_change_population_size)
+  {
+    return(ecoal.t);
+  }
+  else
+  {
+    coal_rate <- 1/effective_population_size_1;
+    return(time_change_population_size + rexp(1, rate = coal_rate));
+  }    
+}
+
+# Run 1000,000 simulations with a Ne of 10000, 1000 in the past and 500 generations 
+sim_times <- replicate(1000000,model.single.pop.with.recent.population.change.tMRCA(10000, 1000, 500))
+
+# Example of execution
+hist(sim_times, breaks = 50, col = "skyblue", main = "TMRCA Distribution", xlab = "Generations")
+```
+
+# Exercise 1). Run 50 times the model with Ne current = 5000, Ne ancestral = 100.
+# Change at random the time of change of Ne, from 10 to 1000 generations.
+# Run 10000 independent fragments. Read the output file and recover the tmrca
+# Compute the mean(log(tmrca)). Plot this value against the time of change of Ne
+
+```{r}
+Ne.current <- 5000;
+Ne.ancient <- 100;
+time.change <- rep(NA,50);
+mean.log.tmrca <- rep(NA,length(time.change));
+for(i in 1:length(time.change))
+{
+  print(i);
+  time.c <- floor(runif(1,10,1000));
+  time.change[i] <- time.c;
+  d <- replicate(100000,model.single.pop.with.recent.population.change.tMRCA(Ne.current, Ne.ancient, time.c));
+  mean.log.tmrca[i] <- mean(log(d));
+}
+
+plot(time.change,mean.log.tmrca)
+```
+
+# Change now so the Ne at present is smaller than in the past. For example
+# current Ne = 500, pastNe = 5000
+
+```{r}
+Ne.current <- 500;
+Ne.ancient <- 5000;
+time.change <- rep(NA,50);
+mean.log.tmrca <- rep(NA,length(time.change));
+for(i in 1:length(time.change))
+{
+  print(i);
+  time.c <- floor(runif(1,10,1000));
+  time.change[i] <- time.c;
+  d <- replicate(100000,model.single.pop.with.recent.population.change.tMRCA(Ne.current, Ne.ancient, time.c));
+  mean.log.tmrca[i] <- mean(log(d));
+}
+
+plot(time.change,mean.log.tmrca)
+```
+
+
+What does this mean?
+
+##################################################################################
+# Exercise 2. Make the inference of the inverse coalescence rate, 
+# which can be approximated to Ne under the assumption of panmixia and lack of
+# population substructure.
+# Do some simulations changing the time when there is the reduction in population
+# size. Is it working?
+###################################################################################
+
+```{r}
+iicr <- function(data, time_bins = seq(0, 9000, by = 100))
+{
+  tmrca_values <- data$Time_.gen.
+  # Define time bins
+  data$time_bin <- cut(data$Time_.gen., breaks = time_bins, include.lowest = TRUE, right = FALSE)
+  
+  # PDF of TMRCA (count per bin)
+  pdf_tbl <- data %>%
+    group_by(time_bin) %>%
+    summarise(pdf = n(), .groups = "drop")
+  
+  # Compute midpoints of time bins
+  bin_mids <- sapply(strsplit(as.character(pdf_tbl$time_bin), ","), function(x) {
+    as.numeric(gsub("\\[|\\)|\\]", "", x)) |> mean()
+  })
+  
+  pdf_tbl$bin_mid <- bin_mids
+  
+  #CDF (cumulative count)
+  pdf_tbl <- pdf_tbl %>%
+    mutate(cdf = cumsum(pdf) - pdf)
+  
+  # Calculate proportions and IICR
+  total <- nrow(data)
+  pdf_tbl <- pdf_tbl %>%
+    mutate(
+      cdf_prop = cdf / total,
+      pdf_prop = pdf / total,
+      coalescence_rate = ifelse((1 - cdf_prop) > 0, pdf_prop / (1 - cdf_prop), NA),
+      IICR = ifelse(coalescence_rate > 0, 1 / coalescence_rate, NA)
+    )
+  
+  # Plot
+  ggplot(pdf_tbl, aes(x = bin_mid, y = IICR)) +
+    geom_line(color = "steelblue") +
+    labs(x = "Time (generations ago)", y = "IICR", title = "Inverse Instantaneous Coalescence Rate") +
+    theme_minimal()  
+}
+
+d <- replicate(1000000,model.single.pop.with.recent.population.change.tMRCA(1000, 5000, 3000));
+data <- data.frame(Time_.gen.=d);
+iicr(data)
+```
+
+
+# What if we have a large Ne at present and a small one in the past?
+
+```{r}
+# current Ne = 10000
+# past Ne = 1000
+# time of change = 2000 generations
+# number of tmrcas to simulate = 100000
+d <- replicate(1000000,model.single.pop.with.recent.population.change.tMRCA(10000, 1000, 3000));
+data <- data.frame(Time_.gen.=d);
+iicr(data)
+```
+
+
+# Exercise 3. Goal: Analyze how the strength and timing of bottlenecks impact coalescence times.
+# Instructions:
+# Run  for different time_change_population_size values: 100, 500, 1000, 1500, 2000, 3000, 5000, 10000 generations. Take Ne to be 1000, Ne bottleneck 500, time of bottleneck 10 generations
+# Plot average TMRCA for each combination.
+# Questions:
+# How does bottleneck timing affect TMRCA more than its severity?
+# For which combination does TMRCA reduce the most?
+
+```{r}
+# Model to sample a tMRCA from a single population with a Ne of population_size_in_present, a ne_bottleneck during a time_duration_bottleneck. After that, the Ne is again population_size_in_present
+model.single.pop.with.bottleneck.tMRCA <- function(population_size_in_present, 
+                                                   ne_bottleneck, 
+                                                   time_change_population_size, 
+                                                   time_duration_bottleneck)
+{
+  # --- Epoch 1: Present Day to Start of Bottleneck ---
+  coal_rate <- 1 / population_size_in_present
+  ecoal.t <- rexp(1, rate = coal_rate)
+  
+  if(ecoal.t <= time_change_population_size)
+  {
+    return(ecoal.t)
+  }
+  
+  # --- Epoch 2: During the Bottleneck ---
+  # If we reach here, lineages survived Epoch 1 without coalescing.
+  # The clock effectively resets at the bottleneck boundary.
+  coal_rate <- 1 / ne_bottleneck
+  ecoal.t <- rexp(1, rate = coal_rate)
+  
+  if(ecoal.t <= time_duration_bottleneck)
+  {
+    # FIX: Return the valid ecoal.t we just drew
+    return(time_change_population_size + ecoal.t)
+  }
+  
+  # --- Epoch 3: Ancient Population (Pre-Bottleneck) ---
+  # If we reach here, lineages survived the bottleneck.
+  # The clock resets again at the ancient boundary.
+  coal_rate <- 1 / population_size_in_present
+  return(time_change_population_size + time_duration_bottleneck + rexp(1, rate = coal_rate))
+}
+
+time.change <- seq(from = 50, to = 10000, by = 400);
+population_size_in_present <- 1000;
+ne_bottleneck <- 500;
+time_duration_bottleneck <- 10;
+
+mean.log.tmrca <- rep(NA,length(time.change));
+for(i in 1:length(time.change))
+{
+  print(i);
+  time_change_population_size <- time.change[i];
+  d <- replicate(1000000,model.single.pop.with.bottleneck.tMRCA(population_size_in_present, ne_bottleneck, time_change_population_size, time_duration_bottleneck));
+  mean.log.tmrca[i] <- mean(log(d));
+}
+
+plot(time.change,mean.log.tmrca)
+
+```
+How would you interprete it?
+
+# Exercise 3.1. How is the IICR if the Current Ne is 10000, Ne bottleneck is 1000, at time of 1000, and duration of bottleneck is 100 generations?
+
+```{r}
+time_change <- 1000;
+population_size_in_present <- 10000;
+ne_bottleneck <- 100;
+time_duration_bottleneck <- 500;
+  d <- replicate(1000000,model.single.pop.with.bottleneck.tMRCA(population_size_in_present, ne_bottleneck, time_change, time_duration_bottleneck));
+data <- data.frame(Time_.gen.=d);
+iicr(data);
+```
+
+# Exercise 3.2. Change the Ne of the bottleneck. Put 1000. What happens with the iicr plot? Why do you think is this happening?
+
+```{r}
+time_change <- 1000;
+population_size_in_present <- 10000;
+ne_bottleneck <- 1000;
+time_duration_bottleneck <- 500;
+  d <- replicate(1000000,model.single.pop.with.bottleneck.tMRCA(population_size_in_present, ne_bottleneck, time_change, time_duration_bottleneck));
+data <- data.frame(Time_.gen.=d);
+iicr(data);
+```
+# Why is this happening?
+
+# Exercise 4: Population substructure makes everything harder
+# Track how long it takes for two lineages to coalesce when they start on the same island versus when they can migrate between two islands.
+
+```{r}
+# Define a single simulation run for a 2-island model
+# State 1: Both lineages on the same island
+# State 2: Lineages on different islands
+# Modified simulation function with explicit Ne and migration rate (m)
+simulate_coalescence_ne <- function(Ne, m) {
+  t <- 0
+  state <- 1  # Start on the same island
+  
+  # Coalescence rate per generation within an island
+  # (Change to 1 / (2 * Ne) if modeling a diploid population)
+  coal_rate <- 1 / Ne
+  
+  # Total migration rate out of the current state.
+  # Since there are 2 lineages, the rate at which *either* moves is 2 * m
+  mig_rate <- 2 * m
+  
+  while(TRUE) {
+    if (state == 1) {
+      # Both on the same island: either can coalesce OR either can migrate
+      total_rate <- coal_rate + mig_rate
+      t <- t + rexp(1, rate = total_rate)
+      
+      # Determine which event happens first
+      if (runif(1) < (coal_rate / total_rate)) {
+        return(t) # Coalescence achieved! Returns time in generations.
+      } else {
+        state <- 2 # One lineage migrated away to the other island
+      }
+    } else {
+      # Different islands: No coalescence possible. 
+      # Only migration can happen to bring them back to the same island.
+      total_rate <- mig_rate
+      t <- t + rexp(1, rate = total_rate)
+      state <- 1  # They are back on the same island
+    }
+  }
+}
+
+# Run 10,000 simulations with a Ne of 1000 and moderate migration rate (M = 0.002). Change the migration rate to 0.00001. Do you see any change in the shape? What about the centrality statistics?
+sim_times <- replicate(1000000, simulate_coalescence_ne(Ne = 1000, m = 0.0002))
+
+# Plot the distribution of coalescence times
+hist(sim_times, breaks = 50, probability = TRUE, col = "skyblue",
+     main = "Stochastic Coalescence Times (2-Island Model)",
+     xlab = "Coalescence Time (t)")
+```
+
+Look at the histogram. Notice the massive "long tail" of late coalescence times. Why does this happen?
+
+# Exercise 5.
+# Compute the IICR in this situation. Even if the effective population size is constant, what is happening here???
+
+
+```{r}
+data <- data.frame(Time_.gen. = sim_times)
+iicr(data)
+```
+
+What is the IICR saying?
+
+
+# Exercise 6: Change the migration rate to something extremely small.
+# How is the shape of the IICR changing? Change the time breaks in the IICR.
+# How is changing the plot?
+
+
+```{r}
+sim_times <- replicate(1000000, simulate_coalescence_ne(Ne = 1000, m = 0.00002))
+data <- data.frame(Time_.gen. = sim_times)
+iicr(data)
+```
+
+
+```{r}
+iicr(data, seq(0, 20000, by = 100))
+```
+
+
+What are these experiment telling us about the IICR? Can we rely on the IICR?
+
+# Exercise 7. 
+# To understand tools like PSMC or MSMC (which are used to infer the IICR), you have to cross a conceptual bridge from pure population genetics into the realm of computer science. The Sequentially Markov Coalescent (SMC) framework treats a chromosome exactly like a time-series sequence generated by a Hidden Markov Model (HMM).
+
+# In the classic Occasionally Dishonest Casino problem, a casino uses a Fair die most of the time, but occasionally switches to a Loaded die (which rolls a 6 half the time). You only see the rolls (Observations), not the die being used (Hidden States).
+
+# In population genomics (SMC):
+
+#    The Die Types (Fair vs. Loaded) map to Coalescence Times / TMRCA (t). In practice, what we do is categorize the TMRCA distribution. How would you do that? What are the problems of applying such methodology given that you do not know the TMRCA distribution?
+
+#    Switching the Die (Transitions) maps to Recombination events changing the local tree as you walk along the chromosome.
+
+#    The Die Rolls (Emissions) map to Mutations (heterozygous sites) observed at specific base pairs.
+
+# Simulate a sequence of 300 die rolls where the casino secretly switches between Fair and Loaded dice.
+
+# Implement the Viterbi Algorithm—the exact same mathematical engine PSMC uses—to look only at the rolls and guess when the casino was cheating.
+
+```{r}
+# 1. SETUP PARAMETERS
+set.seed(123)
+n_rolls <- 300
+
+# A HMM is defined by two types of matrices. A transition matrix, which indicates which is the probability of moving from one (hidden) state to any other of the model.
+# In our case, we have two states: Fair and Loaded
+
+# Transition matrix (Rows/Cols: 1 = Fair, 2 = Loaded)
+# Highly conservative: high probability of staying in the current state
+A <- matrix(c(0.95, 0.05,   # From Fair to: Fair, Loaded
+              0.10, 0.90),  # From Loaded to: Fair, Loaded
+            nrow = 2, byrow = TRUE)
+
+# The second matrix indicates, for each state, which is the value of the category we are at that moment given the current state 
+
+# Emission matrix (Rows: States; Cols: Die faces 1 to 6)
+E <- matrix(c(rep(1/6, 6),            # Fair die: equal probabilities
+              rep(0.1, 5), 0.5),      # Loaded die: 50% chance of rolling a 6
+            nrow = 2, byrow = TRUE)
+
+# 2. SIMULATE THE CASINO
+# true states are by definition not known. This is what we want to infere.
+true_states <- numeric(n_rolls)
+rolls       <- numeric(n_rolls)
+
+current_state <- 1 # Start fair
+for (t in 1:n_rolls) {
+  true_states[t] <- current_state
+  rolls[t]       <- sample(1:6, 1, prob = E[current_state, ])
+  current_state  <- sample(1:2, 1, prob = A[current_state, ])
+}
+
+# How we do infer the most likely sequence of (hidden) states given the observed sequence of categories and the transition and emission probabilites?
+
+# 3. THE VITERBI DECODER (Log-space to prevent numerical underflow)
+viterbi_decode <- function(rolls, A, E) {
+  n <- length(rolls)
+  log_A <- log(A)
+  log_E <- log(E)
+  
+  # Dynamic programming matrices
+  V <- matrix(-Inf, nrow = 2, ncol = n)
+  path <- matrix(0, nrow = 2, ncol = n)
+  
+  # Initialization (assume 50/50 starting probability)
+  V[, 1] <- log(c(0.5, 0.5)) + log_E[, rolls[1]]
+  
+  # Recursion step
+  for (t in 2:n) {
+    for (s in 1:2) {
+      # Math: Maximize (Previous Viterbi + Transition to s) + Emission of roll
+      probabilities <- V[, t-1] + log_A[, s] + log_E[s, rolls[t]]
+      V[s, t]       <- max(probabilities)
+      path[s, t]    <- which.max(probabilities)
+    }
+  }
+  
+  # Traceback step to find the most likely sequence
+  best_path <- numeric(n)
+  best_path[n] <- which.max(V[, n])
+  for (t in (n-1):1) {
+    best_path[t] <- path[best_path[t+1], t+1]
+  }
+  return(best_path)
+}
+
+# Run the decoder
+predicted_states <- viterbi_decode(rolls, A, E)
+
+# Plotting comparisons
+plot(true_states, type = "s", lwd = 5, col = "gray", ylim = c(0.8, 2.2),
+     yaxt = "n", xlab = "Roll Number (Sequence Position)", ylab = "State",
+     main = "HMM Decoding: True vs. Inferred Casino States")
+axis(2, at = c(1, 2), labels = c("Fair", "Loaded"))
+
+# Overlay predicted states
+lines(predicted_states, type = "s", lwd = 2, col = "blue", lty = 2)
+
+# Mark where the '6's occurred to show the clues left behind
+six_positions <- which(rolls == 6)
+points(six_positions, rep(1.5, length(six_positions)), pch = "|", col = "red")
+
+legend("topright", legend = c("True State", "Viterbi Estimate", "Rolled a '6'"),
+       col = c("gray", "blue", "red"), lwd = c(5, 2, 1), lty = c(1, 2, NA), pch = c(NA, NA, "|"))
+```
+
+# Change the values of the transition matrix, so the probability of staying in the same state is even more probable than before, and check how the viterbi algorithm changes the prediction.
+
+```{r}
+A <- matrix(c(0.99, 0.01,   # From Fair to: Fair, Loaded
+              0.05, 0.95),  # From Loaded to: Fair, Loaded
+            nrow = 2, byrow = TRUE)
+
+# The second matrix indicates, for each state, which is the value of the category we are at that moment given the current state 
+
+# Emission matrix (Rows: States; Cols: Die faces 1 to 6)
+E <- matrix(c(rep(1/6, 6),            # Fair die: equal probabilities
+              rep(0.1, 5), 0.5),      # Loaded die: 50% chance of rolling a 6
+            nrow = 2, byrow = TRUE)
+
+# 2. SIMULATE THE CASINO
+# true states are by definition not known. This is what we want to infere.
+true_states <- numeric(n_rolls)
+rolls       <- numeric(n_rolls)
+
+current_state <- 1 # Start fair
+for (t in 1:n_rolls) {
+  true_states[t] <- current_state
+  rolls[t]       <- sample(1:6, 1, prob = E[current_state, ])
+  current_state  <- sample(1:2, 1, prob = A[current_state, ])
+}
+
+# Run the decoder
+predicted_states <- viterbi_decode(rolls, A, E)
+
+# Plotting comparisons
+plot(true_states, type = "s", lwd = 5, col = "gray", ylim = c(0.8, 2.2),
+     yaxt = "n", xlab = "Roll Number (Sequence Position)", ylab = "State",
+     main = "HMM Decoding: True vs. Inferred Casino States")
+axis(2, at = c(1, 2), labels = c("Fair", "Loaded"))
+
+# Overlay predicted states
+lines(predicted_states, type = "s", lwd = 2, col = "blue", lty = 2)
+
+# Mark where the '6's occurred to show the clues left behind
+six_positions <- which(rolls == 6)
+points(six_positions, rep(1.5, length(six_positions)), pch = "|", col = "red")
+
+legend("topright", legend = c("True State", "Viterbi Estimate", "Rolled a '6'"),
+       col = c("gray", "blue", "red"), lwd = c(5, 2, 1), lty = c(1, 2, NA), pch = c(NA, NA, "|"))
+
+```
+
+# Try the same but with a higher probability of changing state
+
+```{r}
+A <- matrix(c(0.90, 0.1,   # From Fair to: Fair, Loaded
+              0.1, 0.9),  # From Loaded to: Fair, Loaded
+            nrow = 2, byrow = TRUE)
+
+# The second matrix indicates, for each state, which is the value of the category we are at that moment given the current state 
+
+# Emission matrix (Rows: States; Cols: Die faces 1 to 6)
+E <- matrix(c(rep(1/6, 6),            # Fair die: equal probabilities
+              rep(0.1, 5), 0.5),      # Loaded die: 50% chance of rolling a 6
+            nrow = 2, byrow = TRUE)
+
+# 2. SIMULATE THE CASINO
+# true states are by definition not known. This is what we want to infere.
+true_states <- numeric(n_rolls)
+rolls       <- numeric(n_rolls)
+
+current_state <- 1 # Start fair
+for (t in 1:n_rolls) {
+  true_states[t] <- current_state
+  rolls[t]       <- sample(1:6, 1, prob = E[current_state, ])
+  current_state  <- sample(1:2, 1, prob = A[current_state, ])
+}
+
+# Run the decoder
+predicted_states <- viterbi_decode(rolls, A, E)
+
+# Plotting comparisons
+plot(true_states, type = "s", lwd = 5, col = "gray", ylim = c(0.8, 2.2),
+     yaxt = "n", xlab = "Roll Number (Sequence Position)", ylab = "State",
+     main = "HMM Decoding: True vs. Inferred Casino States")
+axis(2, at = c(1, 2), labels = c("Fair", "Loaded"))
+
+# Overlay predicted states
+lines(predicted_states, type = "s", lwd = 2, col = "blue", lty = 2)
+
+# Mark where the '6's occurred to show the clues left behind
+six_positions <- which(rolls == 6)
+points(six_positions, rep(1.5, length(six_positions)), pch = "|", col = "red")
+
+legend("topright", legend = c("True State", "Viterbi Estimate", "Rolled a '6'"),
+       col = c("gray", "blue", "red"), lwd = c(5, 2, 1), lty = c(1, 2, NA), pch = c(NA, NA, "|"))
+
+```
+
+
+# In practice, we do not know which is the transition and emission probability matrices. We will need to infer them and identify to which state the observed sequence belongs.
