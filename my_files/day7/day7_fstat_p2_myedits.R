@@ -35,7 +35,7 @@ f2_dir     <- "f2data_1240k"                        # will store f2 blocks
 
 # find_graphs() automates the search for admixture graphs by exploring many
 # random topologies and optimising branch lengths and admixture weights for each.
-# It returns a ranked list of graphs by score.
+# It returns a ranked list of graphs by score. From worst to best.
 
 # Here we will investigate the relationships between ancient samples from Africa
 # that predate migrations associated with food production in the continent.
@@ -58,7 +58,7 @@ results <- lapply(0:4, function(n) {
   # Run find_graphs
   g      <- find_graphs(f2_blocks_strict, numadmix = n, outpop = "Chimp")
   
-  # Get winner (lowest score) for each numadmix
+  # Get winner (the one with the lowest score) for each numadmix
   winner <- g[which.min(g$score), ]
   
   # Run the original qpGraph function to obtain the worst residual
@@ -73,7 +73,8 @@ results <- lapply(0:4, function(n) {
 })
 
 # Questions: What is the minimum number of admixture events required to obtain a 
-# graph with the worst residuals (Z scores) below 3 in your results?
+# graph with the worst residuals (Z scores) below 3 in your results? 
+## numadmix = 3 | score = 0.0021 | worst residual = 0.03
 # Does the score improve substantially for higher number of admixture events?
 
 
@@ -326,4 +327,3 @@ qpadm_results <- lapply(seq_len(nrow(good_pairs)), function(i) {
 #     SNP ascertainment schemes
 #   - ADMIXTOOLS v2 documentation
 ################################################################################
-
