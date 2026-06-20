@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.geno
+*.snp
+*.ind
+__MACOSX
+f2data_1240k/
