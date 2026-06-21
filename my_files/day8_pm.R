@@ -129,4 +129,34 @@ plot(fst_NAM_EAS$POS, fst_NAM_EAS$WEIR_AND_COCKERHAM_FST,
      main = "Pairwise FST - NAM vs EAS",
      xlab = "Position (chr2)",
      ylab = "FST")  # <-- closing parenthesis was missing
-     
+
+
+##### Lets now work With the dog data##
+
+## NOTE THAT THIS IS WRONG AS IT IS!!! NEED TO LOOK INTO TÁBITA SLIDES
+
+setwd("/Users/lucas/EMBO_PopGen_2026/Tabita_Hunemeier/Practical_Session_Selection_EMBO/input/Part_2_CanidDiversity")
+
+
+input_dir <- "input/Part_2_CanidDiversity"
+figures_dir <- "figures/figs_canid_diversity"
+
+## = 1. Plot SNP-Level XP-nSL (-log18 P-value) -
+norm_file <- file.path(input_dir, "xpnsl_phased.xpnsl.out.norn")
+xpnsl_data <- read.table(norm_file, header = TRUE, sep = "\t")
+xpnslL_data <- na.onit(xpnsl_data)
+
+# Calculate two-tailed p-value from standard normal 2-score
+xpnsl_dataśp_val +2 * prorm-abs(xpasl_datasnora_xpnsl))
+xpnsL_data$p_val[xpnsl_datasp_val ≤ 0] + 10-15 # prevent zero p-values
+xpnsl_dataLogGP (• -Log10(xpnsl_datasp_val)
+
+#Highlight the IGF1 region (around 41-45.5 Hb)
+igfi_start +- 4106
+igf1_and + 45.5e6
+xpnsl_datasis_igf1 + xpnsl_dataspos ≥ igf2_start & xposl_dataspos ≤ 1gf2_end
+
+#Got the peak values for the sweep region
+igf1_peak_log10p+ max(xpnsl_datalog10P[xpnsl_datalis_igf1], na.rm = TRUE)
+peak_id + which(xpnsl_datasis_1g2& xpns_data og10P=igf1_peak_20g20p[1]
+peak pos + xpnsl_dataśpos[peak_idx] / 1e6
